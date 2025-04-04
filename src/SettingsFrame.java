@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Properties;
 
 public class SettingsFrame extends JFrame {
 
@@ -19,7 +20,11 @@ public class SettingsFrame extends JFrame {
         JSlider volumeSlider = new JSlider(0, 100, 50);
 
         saveHistoryCheckBox = new JCheckBox("Save Game History");
-        saveHistoryCheckBox.setSelected(true);
+
+        Properties config = ConfigManager.loadConfig();
+
+        saveHistoryCheckBox.setSelected(Boolean.parseBoolean(config.getProperty("saveHistory", "true")));
+        volumeSlider.setValue(Integer.parseInt(config.getProperty("volume", "50")));
 
         JButton applyButton = new JButton("Apply");
         applyButton.addActionListener(new ActionListener() {
@@ -28,6 +33,9 @@ public class SettingsFrame extends JFrame {
                 boolean saveHistory = saveHistoryCheckBox.isSelected();
                 //
                 System.out.println("Save History: " + saveHistory);
+                int volume = volumeSlider.getValue();
+                ConfigManager.saveConfig(saveHistory, volume);
+                
                 JOptionPane.showMessageDialog(SettingsFrame.this, "Setting applied!");
                 dispose();
             }
