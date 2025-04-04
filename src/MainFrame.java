@@ -2,9 +2,11 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 
 public class MainFrame extends JFrame {
 
+    private JLabel bestTimeLabel;
     public MainFrame() {
         setTitle("Super Hexagon");
         setSize(800, 600);
@@ -21,6 +23,20 @@ public class MainFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JOptionPane.showMessageDialog(MainFrame.this, "Starting the game ...");
+            }
+        });
+
+        bestTimeLabel = new JLabel("Best Time: " + getBestTime());
+        bestTimeLabel.setPreferredSize(new Dimension(200, 30));
+        bestTimeLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
+        JButton historyButton = new JButton("Game History");
+        historyButton.setPreferredSize(new Dimension(200, 50));
+        historyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //
+                JOptionPane.showMessageDialog(MainFrame.this, "Opening game history ...");
             }
         });
 
@@ -45,6 +61,8 @@ public class MainFrame extends JFrame {
         });
 
         mainMenuPanel.add(startButton);
+        mainMenuPanel.add(bestTimeLabel);
+        mainMenuPanel.add(historyButton);
         mainMenuPanel.add(settingsButton);
         mainMenuPanel.add(exitButton);
 
@@ -53,4 +71,22 @@ public class MainFrame extends JFrame {
         setVisible(true);
     }
 
+    private String getBestTime(){
+        String bestTime = "N/A";
+        try (BufferedReader br = new BufferedReader(new FileReader("best_time.txt"))){
+            bestTime = br.readLine();
+        } catch (IOException e) {
+
+        }
+        return bestTime;
+    }
+
+    public void updateBestTime(String newTime) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("best_time.txt"))) {
+            bw.write(newTime);
+            bestTimeLabel.setText("Best Time: " + newTime);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

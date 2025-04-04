@@ -46,6 +46,8 @@ public class SettingsFrame extends JFrame {
         settingsPanel.add(saveHistoryCheckBox);
         settingsPanel.add(applyButton);
 
+        add(settingsPanel);
+
         setVisible(true);
     }
 
