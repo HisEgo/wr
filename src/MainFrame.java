@@ -30,7 +30,7 @@ public class MainFrame extends JFrame {
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(MainFrame.this, "Opening settings ...");
+                new SettingsFrame();
             }
         });
 
