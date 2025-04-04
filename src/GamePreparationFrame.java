@@ -27,6 +27,7 @@ public class GamePreparationFrame extends JFrame {
                     //
                     JOptionPane.showMessageDialog(GamePreparationFrame.this, "Starting game with " + playerName);
                     dispose();
+                    new GameFrame();
                 } else {
                     JOptionPane.showMessageDialog(GamePreparationFrame.this, "Please enter your name!");
                 }
