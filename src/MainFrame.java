@@ -22,7 +22,7 @@ public class MainFrame extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(MainFrame.this, "Starting the game ...");
+                new GamePreparationFrame();
             }
         });
 
