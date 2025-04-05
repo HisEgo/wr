@@ -35,10 +35,9 @@ public class GamePanel extends JPanel implements ActionListener {
         random = new Random();
 
         obstacleSpawnDistance = hexagonSize * 3;
-        timer = new Timer(20, this); // کاهش سرعت تایمر برای حرکت نرم‌تر
+        timer = new Timer(20, this);
         timer.start();
 
-        // اضافه کردن key binding برای چرخش به چپ
         InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
         ActionMap am = getActionMap();
 
@@ -50,7 +49,6 @@ public class GamePanel extends JPanel implements ActionListener {
             }
         });
 
-        // اضافه کردن key binding برای چرخش به راست
         im.put(KeyStroke.getKeyStroke("RIGHT"), "rotateRight");
         am.put("rotateRight", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
@@ -109,17 +107,14 @@ public class GamePanel extends JPanel implements ActionListener {
         if (e.getSource() == timer) {
             addNewObstacle();
 
-            // استفاده از Iterator برای حذف موانع
             Iterator<Obstacle> iterator = obstacles.iterator();
             while (iterator.hasNext()) {
                 Obstacle obstacle = iterator.next();
                 obstacle.update();
 
-                // بررسی برخورد با 6 ضلعی مرکزی
                 if (obstacle.getCurrentSize() <= hexagonSize) {
-                    iterator.remove(); // حذف مانع اگر به اندازه کافی کوچک شده باشد
+                    iterator.remove();
                     obstacleCreated = false;
-                    score++; // افزایش امتیاز
                 }
             }
 
@@ -134,17 +129,19 @@ public class GamePanel extends JPanel implements ActionListener {
 
             int initialSize = 200;
             int borderWidth = 5;
-            double shrinkRate = 0.4; // سرعت کوچک شدن
+            double shrinkRate = 1;
             double speed = 1;
             Color color = Color.WHITE;
 
             int sector = random.nextInt(6);
             double angle = 2 * Math.PI / 6 * sector;
 
+            int obstacleType = random.nextInt(3) + 1;
+
             int x = centerX;
             int y = centerY;
 
-            Obstacle obstacle = new Obstacle(x, y, initialSize, borderWidth, shrinkRate, speed, color, angle);
+            Obstacle obstacle = new Obstacle(x, y, initialSize, borderWidth, shrinkRate, speed, color, angle, obstacleType);
             obstacles.add(obstacle);
             obstacleCreated = true;
         }

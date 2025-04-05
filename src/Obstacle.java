@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.Random;
 
 public class Obstacle {
     private int x;
@@ -11,8 +12,10 @@ public class Obstacle {
     private double speed;
     private Color color;
     private double rotationAngle;
+    private int obstacleType;
+    private boolean[] sides;
 
-    public Obstacle(int x, int y, int initialSize, int borderWidth, double shrinkRate, double speed, Color color, double rotationAngle) {
+    public Obstacle(int x, int y, int initialSize, int borderWidth, double shrinkRate, double speed, Color color, double rotationAngle, int obstacleType) {
         this.x = x;
         this.y = y;
         this.initialSize = initialSize;
@@ -22,6 +25,38 @@ public class Obstacle {
         this.speed = speed;
         this.color = color;
         this.rotationAngle = rotationAngle;
+        this.obstacleType = obstacleType;
+        this.sides = new boolean[6];
+        generateSides();
+    }
+
+    private void generateSides() {
+        Random random = new Random();
+        switch (obstacleType) {
+            case 1:
+                for (int i = 0; i < 6; i++) {
+                    sides[i] = (i % 2 == 0);
+                }
+                break;
+            case 2:
+                int missingSide = random.nextInt(6);
+                for (int i = 0; i < 6; i++) {
+                    sides[i] = (i != missingSide);
+                }
+                break;
+            case 3:
+                int count = 0;
+                for (int i = 0; i < 6; i++) {
+                    sides[i] = random.nextBoolean();
+                    if (sides[i]) {
+                        count++;
+                    }
+                }
+                if (count == 0) {
+                    sides[random.nextInt(6)] = true;
+                }
+                break;
+        }
     }
 
     public void draw(Graphics2D g2d) {
@@ -31,8 +66,22 @@ public class Obstacle {
         g2d.rotate(rotationAngle);
         g2d.translate(-x, -y);
 
-        Hexagon hexagon = new Hexagon(x, y, (int) currentSize, borderWidth, color);
-        hexagon.draw(g2d);
+        int numPoints = 6;
+        int[] xPoints = new int[numPoints];
+        int[] yPoints = new int[numPoints];
+        for (int i = 0; i < numPoints; i++) {
+            double angle = 2 * Math.PI / numPoints * i;
+            xPoints[i] = x + (int) (currentSize * Math.cos(angle));
+            yPoints[i] = y + (int) (currentSize * Math.sin(angle));
+        }
+
+        g2d.setColor(color);
+        g2d.setStroke(new BasicStroke(borderWidth));
+        for (int i = 0; i < numPoints; i++) {
+            if (sides[i]) {
+                g2d.drawLine(xPoints[i], yPoints[i], xPoints[(i + 1) % numPoints], yPoints[(i + 1) % numPoints]);
+            }
+        }
 
         g2d.setTransform(originalTransform);
     }
@@ -114,5 +163,21 @@ public class Obstacle {
 
     public void setInitialSize(int initialSize) {
         this.initialSize = initialSize;
+    }
+
+    public int getObstacleType() {
+        return obstacleType;
+    }
+
+    public void setObstacleType(int obstacleType) {
+        this.obstacleType = obstacleType;
+    }
+
+    public boolean[] getSides() {
+        return sides;
+    }
+
+    public void setSides(boolean[] sides) {
+        this.sides = sides;
     }
 }
