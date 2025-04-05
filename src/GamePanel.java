@@ -20,6 +20,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private Timer timer;
     private boolean obstacleCreated = false;
     private int score = 0;
+    private int obstacleSpacing = 150;
 
 
     public GamePanel() {
@@ -123,13 +124,13 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     private void addNewObstacle() {
-        if (!obstacleCreated) {
+        if (obstacles.isEmpty() || obstacles.get(obstacles.size() - 1).getInitialSize() - obstacles.get(obstacles.size() - 1).getCurrentSize() > obstacleSpacing) {
             centerX = getWidth() / 2;
             centerY = getHeight() / 2;
 
-            int initialSize = 200;
-            int borderWidth = 5;
-            double shrinkRate = 1;
+            int initialSize = 400;
+            int borderWidth = 20;
+            double shrinkRate = 2;
             double speed = 1;
             Color color = Color.WHITE;
 
