@@ -25,6 +25,7 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         hexagon = new Hexagon(0, 0, 50);
         player = new Player(0, 0, 30);
+
         obstacles = new ArrayList<>();
 
         timer = new Timer(10, this);
@@ -75,6 +76,8 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         player.draw(g2d);
         drawObstacles(g2d);
 
+        drawSectors(g2d, centerX, centerY);
+
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
         g2d.drawString("Score: " + score, 10, 30);
@@ -105,6 +108,18 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
         //
     }
 
+    private void drawSectors(Graphics2D g2d, int centerX, int centerY) {
+        g2d.setColor(Color.DARK_GRAY);
+        int hexagonSize = hexagon.getSize();
+
+        for (int i = 0; i < 6; i++) {
+            double angle = 2 * Math.PI / 6 * i;
+            int x = centerX + (int) (1000 * Math.cos(angle));
+            int y = centerY + (int) (1000 * Math.sin(angle));
+            g2d.drawLine(centerX, centerY, x, y);
+        }
+    }
+
     class Hexagon {
         private int x, y, size;
 
@@ -132,6 +147,10 @@ public class GamePanel extends JPanel implements ActionListener, KeyListener {
 
         public void setY(int y){
             this.y = y;
+        }
+
+        public int getSize() {
+            return size;
         }
     }
 }
