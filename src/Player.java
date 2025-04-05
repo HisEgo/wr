@@ -3,8 +3,9 @@ import java.awt.*;
 class Player {
     private int x, y, size;
     private double angle = 0;
-    private double rotationSpeed = 0.05;
+    private double rotationSpeed = 0.1;
     private int distanceFromCenter = 40;
+    private int centerX, centerY;
 
     public Player(int x, int y, int size) {
         this.x = x;
@@ -14,8 +15,8 @@ class Player {
 
     public void draw(Graphics2D g) {
         g.setColor(Color.GREEN);
-        int playerX = x + (int) ((size + distanceFromCenter) * Math.cos(angle));
-        int playerY = y + (int) ((size + distanceFromCenter) * Math.sin(angle));
+        int playerX = x;
+        int playerY = y;
 
         int[] xPoints = {
                 playerX + (int) (size / 2 * Math.cos(angle)),
@@ -44,5 +45,18 @@ class Player {
 
     public void setY(int y) {
         this.y = y;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public int getDistanceFromCenter() {
+        return distanceFromCenter;
+    }
+
+    public void setCenter(int centerX, int centerY) {
+        this.centerX = centerX;
+        this.centerY = centerY;
     }
 }

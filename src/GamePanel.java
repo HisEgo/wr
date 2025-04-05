@@ -11,6 +11,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private Hexagon hexagon;
     private int hexagonSize;
+    private int largerHexagonSize;
     private Player player;
     private List<Obstacle> obstacles;
     private Random random;
@@ -21,6 +22,8 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean obstacleCreated = false;
     private int score = 0;
     private int obstacleSpacing = 150;
+    private double[] hexagonX;
+    private double[] hexagonY;
 
 
     public GamePanel() {
@@ -30,8 +33,9 @@ public class GamePanel extends JPanel implements ActionListener {
         requestFocusInWindow();
 
         hexagonSize = 35;
+        largerHexagonSize = 55;
         hexagon = new Hexagon(getWidth() / 2, getHeight() / 2, hexagonSize, 2, Color.WHITE);
-        player = new Player(getWidth() / 2, getHeight() / 2, 10);
+        player = new Player(getWidth() / 2, getHeight() / 2, 20);
         obstacles = new ArrayList<>();
         random = new Random();
 
@@ -57,6 +61,9 @@ public class GamePanel extends JPanel implements ActionListener {
                 repaint();
             }
         });
+
+        hexagonX = new double[6];
+        hexagonY = new double[6];
     }
 
     @Override
@@ -72,6 +79,10 @@ public class GamePanel extends JPanel implements ActionListener {
         hexagon.setY(centerY);
         player.setX(centerX);
         player.setY(centerY);
+        player.setCenter(centerX, centerY);
+
+        calculateHexagonVertices();
+        calculatePlayerPosition();
 
         drawSectors(g2d, centerX, centerY);
 
@@ -84,6 +95,31 @@ public class GamePanel extends JPanel implements ActionListener {
         g2d.drawString("Score: " + score, 10, 30);
     }
 
+    private void calculateHexagonVertices() {
+        for (int i = 0; i < 6; i++) {
+            double angle = 2 * Math.PI / 6 * i;
+            hexagonX[i] = centerX + largerHexagonSize * Math.cos(angle);
+            hexagonY[i] = centerY + largerHexagonSize * Math.sin(angle);
+        }
+    }
+
+    private void calculatePlayerPosition() {
+        double angle = player.getAngle();
+        int sector = (int) Math.floor(angle / (Math.PI / 3));
+        sector = (sector % 6 + 6) % 6;
+
+        double sectorAngle = angle % (Math.PI / 3);
+        double t = sectorAngle / (Math.PI / 3);
+
+        int nextSector = (sector + 1) % 6;
+
+        double playerX = hexagonX[sector] + (hexagonX[nextSector] - hexagonX[sector]) * t;
+        double playerY = hexagonY[sector] + (hexagonY[nextSector] - hexagonY[sector]) * t;
+
+        player.setX((int) playerX);
+        player.setY((int) playerY);
+    }
+
 
     private void drawObstacles(Graphics2D g2d) {
         for (Obstacle obstacle : obstacles) {
@@ -93,7 +129,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void drawSectors(Graphics2D g2d, int centerX, int centerY) {
         g2d.setColor(Color.DARK_GRAY);
-        int hexagonSize = hexagon.getSize();
 
         for (int i = 0; i < 6; i++) {
             double angle = 2 * Math.PI / 6 * i;
