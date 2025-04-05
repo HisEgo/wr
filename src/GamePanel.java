@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -34,8 +35,29 @@ public class GamePanel extends JPanel implements ActionListener {
         random = new Random();
 
         obstacleSpawnDistance = hexagonSize * 3;
-        timer = new Timer(1000, this);
+        timer = new Timer(20, this); // کاهش سرعت تایمر برای حرکت نرم‌تر
         timer.start();
+
+        // اضافه کردن key binding برای چرخش به چپ
+        InputMap im = getInputMap(WHEN_IN_FOCUSED_WINDOW);
+        ActionMap am = getActionMap();
+
+        im.put(KeyStroke.getKeyStroke("LEFT"), "rotateLeft");
+        am.put("rotateLeft", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                player.rotateLeft();
+                repaint();
+            }
+        });
+
+        // اضافه کردن key binding برای چرخش به راست
+        im.put(KeyStroke.getKeyStroke("RIGHT"), "rotateRight");
+        am.put("rotateRight", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                player.rotateRight();
+                repaint();
+            }
+        });
     }
 
     @Override
@@ -51,13 +73,6 @@ public class GamePanel extends JPanel implements ActionListener {
         hexagon.setY(centerY);
         player.setX(centerX);
         player.setY(centerY);
-
-        // تنظیم موقعیت مانع
-        if (!obstacles.isEmpty()) {
-            Obstacle obstacle = obstacles.get(0);
-            obstacle.setX(centerX);
-            obstacle.setY(centerY);
-        }
 
         drawSectors(g2d, centerX, centerY);
 
@@ -93,6 +108,21 @@ public class GamePanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == timer) {
             addNewObstacle();
+
+            // استفاده از Iterator برای حذف موانع
+            Iterator<Obstacle> iterator = obstacles.iterator();
+            while (iterator.hasNext()) {
+                Obstacle obstacle = iterator.next();
+                obstacle.update();
+
+                // بررسی برخورد با 6 ضلعی مرکزی
+                if (obstacle.getCurrentSize() <= hexagonSize) {
+                    iterator.remove(); // حذف مانع اگر به اندازه کافی کوچک شده باشد
+                    obstacleCreated = false;
+                    score++; // افزایش امتیاز
+                }
+            }
+
             repaint();
         }
     }
@@ -102,8 +132,10 @@ public class GamePanel extends JPanel implements ActionListener {
             centerX = getWidth() / 2;
             centerY = getHeight() / 2;
 
-            int outerSize = 300;
-            int borderWidth = 20;
+            int initialSize = 200;
+            int borderWidth = 5;
+            double shrinkRate = 0.4; // سرعت کوچک شدن
+            double speed = 1;
             Color color = Color.WHITE;
 
             int sector = random.nextInt(6);
@@ -112,7 +144,7 @@ public class GamePanel extends JPanel implements ActionListener {
             int x = centerX;
             int y = centerY;
 
-            Obstacle obstacle = new Obstacle(x, y, outerSize, borderWidth, 0, 0, color, angle);
+            Obstacle obstacle = new Obstacle(x, y, initialSize, borderWidth, shrinkRate, speed, color, angle);
             obstacles.add(obstacle);
             obstacleCreated = true;
         }
