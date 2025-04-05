@@ -24,6 +24,9 @@ public class GamePanel extends JPanel implements ActionListener {
     private int obstacleSpacing = 150;
     private double[] hexagonX;
     private double[] hexagonY;
+    private Color randomColor;
+    private int colorChangeInterval = 30; // هر 30 فریم رنگ عوض میشه
+    private int frameCounter = 0;
 
 
     public GamePanel() {
@@ -129,6 +132,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void drawSectors(Graphics2D g2d, int centerX, int centerY) {
         g2d.setColor(Color.DARK_GRAY);
+        int hexagonSize = hexagon.getSize();
 
         for (int i = 0; i < 6; i++) {
             double angle = 2 * Math.PI / 6 * i;
@@ -152,6 +156,14 @@ public class GamePanel extends JPanel implements ActionListener {
                     iterator.remove();
                     obstacleCreated = false;
                 }
+            }
+
+            frameCounter++; // افزایش شمارنده فریم
+
+            if (frameCounter >= colorChangeInterval) {
+                generateRandomColor(); // تولید رنگ تصادفی جدید
+                frameCounter = 0; // ریست کردن شمارنده فریم
+                setBackground(randomColor);
             }
 
             repaint();
@@ -181,5 +193,12 @@ public class GamePanel extends JPanel implements ActionListener {
             obstacles.add(obstacle);
             obstacleCreated = true;
         }
+    }
+
+    private void generateRandomColor() {
+        int red = random.nextInt(256);
+        int green = random.nextInt(256);
+        int blue = random.nextInt(256);
+        randomColor = new Color(red, green, blue);
     }
 }

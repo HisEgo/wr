@@ -186,4 +186,6 @@ public class Obstacle {
     public void setObstacleType(int obstacleType) {
         this.obstacleType = obstacleType;
     }
+
+
 }
