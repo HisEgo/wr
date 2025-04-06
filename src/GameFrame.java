@@ -4,7 +4,7 @@ public class GameFrame extends JFrame {
     public GameFrame(){
         setTitle("Super Hexagon");
         setResizable(false);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
 

@@ -91,6 +91,14 @@ class Player {
         return distanceFromCenter;
     }
 
+    public int getSize() {
+        return size;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
     public void setCenter(int centerX, int centerY) {
         this.centerX = centerX;
         this.centerY = centerY;

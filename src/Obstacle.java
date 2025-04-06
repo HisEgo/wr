@@ -52,7 +52,9 @@ public class Obstacle {
                         count++;
                     }
                 }
-                if (count == 0) {
+                if (count == 6) {
+                    sides[random.nextInt(6)] = false;
+                } else if (count == 0) {
                     sides[random.nextInt(6)] = true;
                 }
                 break;

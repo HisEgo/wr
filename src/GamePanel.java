@@ -27,6 +27,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private Color randomColor;
     private int colorChangeInterval = 30;
     private int frameCounter = 0;
+    private boolean gameOver = false;
 
 
     public GamePanel() {
@@ -94,6 +95,17 @@ public class GamePanel extends JPanel implements ActionListener {
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
         g2d.drawString("Score: " + score, 10, 30);
+
+        if (gameOver) {
+            g2d.setColor(Color.RED);
+            g2d.setFont(new Font("Arial", Font.BOLD, 40));
+            FontMetrics fm = g2d.getFontMetrics();
+            String gameOverText = "Game Over!";
+            int textWidth = fm.stringWidth(gameOverText);
+            int textX = centerX - textWidth / 2;
+            int textY = centerY;
+            g2d.drawString(gameOverText, textX, textY);
+        }
     }
 
     private void calculateHexagonVertices() {
@@ -142,6 +154,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        if (gameOver) {
+            return;
+        }
+
         if (e.getSource() == timer) {
             addNewObstacle();
 
@@ -153,6 +169,13 @@ public class GamePanel extends JPanel implements ActionListener {
                 if (obstacle.getCurrentSize() <= hexagonSize) {
                     iterator.remove();
                     obstacleCreated = false;
+                }
+
+                if (checkCollision(obstacle)) {
+                    gameOver = true;
+                    timer.stop();
+                    repaint();
+                    break;
                 }
             }
 
@@ -166,6 +189,47 @@ public class GamePanel extends JPanel implements ActionListener {
 
             repaint();
         }
+    }
+
+    private boolean checkCollision(Obstacle obstacle) {
+        double playerDistanceFromCenter = hexagonSize;
+
+        double playerAngle = player.getAngle();
+        int sector = (int) Math.floor(playerAngle / (Math.PI / 3));
+        sector = (sector % 6 + 6) % 6;
+
+        double obstacleSize = obstacle.getCurrentSize();
+        double angle1 = 2 * Math.PI / 6 * sector;
+        double angle2 = 2 * Math.PI / 6 * (sector + 1);
+
+        double x1 = centerX + (obstacleSize) * Math.cos(angle1);
+        double y1 = centerY + (obstacleSize) * Math.sin(angle1);
+        double x2 = centerX + (obstacleSize) * Math.cos(angle2);
+        double y2 = centerY + (obstacleSize) * Math.sin(angle2);
+
+        double x1Offset = centerX + (obstacleSize + obstacle.getBorderWidth()) * Math.cos(angle1);
+        double y1Offset = centerY + (obstacleSize + obstacle.getBorderWidth()) * Math.sin(angle1);
+        double x2Offset = centerX + (obstacleSize + obstacle.getBorderWidth()) * Math.cos(angle2);
+        double y2Offset = centerY + (obstacleSize + obstacle.getBorderWidth()) * Math.sin(angle2);
+
+        double playerX = player.getX();
+        double playerY = player.getY();
+
+        boolean inside = isInside(playerX, playerY, new double[]{x1, x2, x2Offset, x1Offset}, new double[]{y1, y2, y2Offset, y1Offset});
+
+        return inside;
+    }
+
+    private boolean isInside(double x, double y, double[] polyX, double[] polyY) {
+        int n = polyX.length;
+        boolean inside = false;
+        for (int i = 0, j = n - 1; i < n; j = i++) {
+            if (((polyY[i] > y) != (polyY[j] > y)) &&
+                    (x < (polyX[j] - polyX[i]) * (y - polyY[i]) / (polyY[j] - polyY[i]) + polyX[i])) {
+                inside = !inside;
+            }
+        }
+        return inside;
     }
 
     private void addNewObstacle() {
