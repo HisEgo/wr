@@ -25,7 +25,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private double[] hexagonX;
     private double[] hexagonY;
     private Color randomColor;
-    private int colorChangeInterval = 30; // هر 30 فریم رنگ عوض میشه
+    private int colorChangeInterval = 30;
     private int frameCounter = 0;
 
 
@@ -80,8 +80,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
         hexagon.setX(centerX);
         hexagon.setY(centerY);
-        player.setX(centerX);
-        player.setY(centerY);
         player.setCenter(centerX, centerY);
 
         calculateHexagonVertices();
@@ -158,11 +156,11 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
             }
 
-            frameCounter++; // افزایش شمارنده فریم
+            frameCounter++;
 
             if (frameCounter >= colorChangeInterval) {
-                generateRandomColor(); // تولید رنگ تصادفی جدید
-                frameCounter = 0; // ریست کردن شمارنده فریم
+                generateRandomColor();
+                frameCounter = 0;
                 setBackground(randomColor);
             }
 
