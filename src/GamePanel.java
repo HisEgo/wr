@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.awt.geom.AffineTransform;
 
 public class GamePanel extends JPanel implements ActionListener {
 
@@ -28,6 +29,9 @@ public class GamePanel extends JPanel implements ActionListener {
     private int colorChangeInterval = 30;
     private int frameCounter = 0;
     private boolean gameOver = false;
+
+    private double globalRotationAngle = 0;
+    private double rotationSpeed = 0.01;
 
 
     public GamePanel() {
@@ -86,11 +90,17 @@ public class GamePanel extends JPanel implements ActionListener {
         calculateHexagonVertices();
         calculatePlayerPosition();
 
+        g2d.rotate(globalRotationAngle, centerX, centerY);
         drawSectors(g2d, centerX, centerY);
-
         hexagon.draw(g2d);
+        g2d.rotate(-globalRotationAngle, centerX, centerY);
+
+        g2d.rotate(globalRotationAngle, centerX, centerY);
         player.draw(g2d);
+        g2d.rotate(-globalRotationAngle, centerX, centerY);
+
         drawObstacles(g2d);
+
 
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
@@ -136,7 +146,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void drawObstacles(Graphics2D g2d) {
         for (Obstacle obstacle : obstacles) {
+            AffineTransform originalTransform = g2d.getTransform();
+            g2d.translate(centerX, centerY);
+            g2d.rotate(globalRotationAngle);
+            g2d.translate(-centerX, -centerY);
             obstacle.draw(g2d);
+            g2d.setTransform(originalTransform);
         }
     }
 
@@ -186,6 +201,8 @@ public class GamePanel extends JPanel implements ActionListener {
                 frameCounter = 0;
                 setBackground(randomColor);
             }
+
+            globalRotationAngle = (globalRotationAngle + rotationSpeed) % (2 * Math.PI);
 
             repaint();
         }
@@ -245,6 +262,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
             int sector = random.nextInt(6);
             double angle = 2 * Math.PI / 6 * sector;
+            // Correct the angle based on the sector
+            angle = Math.round(angle / (Math.PI / 3)) * (Math.PI / 3);
 
             int obstacleType = random.nextInt(3) + 1;
 
@@ -263,4 +282,5 @@ public class GamePanel extends JPanel implements ActionListener {
         int blue = random.nextInt(256);
         randomColor = new Color(red, green, blue);
     }
+
 }

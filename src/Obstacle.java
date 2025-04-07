@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.Random;
 
+
 public class Obstacle {
     private int x;
     private int y;
@@ -11,9 +12,11 @@ public class Obstacle {
     private double shrinkRate;
     private double speed;
     private Color color;
-    private double rotationAngle;
     private int obstacleType;
     private boolean[] sides;
+
+    private double rotationAngle = 0;
+
 
     public Obstacle(int x, int y, int initialSize, int borderWidth, double shrinkRate, double speed, Color color, double rotationAngle, int obstacleType) {
         this.x = x;
@@ -188,6 +191,5 @@ public class Obstacle {
     public void setObstacleType(int obstacleType) {
         this.obstacleType = obstacleType;
     }
-
 
 }
