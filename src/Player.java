@@ -109,4 +109,13 @@ class Player {
             hexagonY[i] = centerY + distanceFromCenter * Math.sin(angle);
         }
     }
+
+    public int getCurrentSector() {
+        double angle = getAngle();
+        angle = angle % (2 * Math.PI);
+        if (angle < 0) {
+            angle += 2 * Math.PI;
+        }
+        return (int) (angle / (Math.PI / 3));
+    }
 }

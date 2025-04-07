@@ -39,8 +39,8 @@ public class Hexagon {
         Path2D hexagon = new Path2D.Double();
         for (int i = 0; i < 6; i++) {
             double angle = 2 * Math.PI / 6 * i;
-            double pointX = x + 80 * Math.cos(angle);
-            double pointY = y + 80 * Math.sin(angle);
+            double pointX = x + 50 * Math.cos(angle);
+            double pointY = y + 50 * Math.sin(angle);
             if (i == 0) {
                 hexagon.moveTo(pointX, pointY);
             } else {

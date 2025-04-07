@@ -1,7 +1,8 @@
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-
 
 public class Obstacle {
     private int x;
@@ -13,7 +14,7 @@ public class Obstacle {
     private double speed;
     private Color color;
     private int obstacleType;
-    private boolean[] sides;
+    public boolean[] sides;
 
     private double rotationAngle = 0;
 
@@ -64,6 +65,33 @@ public class Obstacle {
         }
     }
 
+    public List<Integer> getOccupiedSectors(double globalRotationAngle) {
+        List<Integer> occupiedSectors = new ArrayList<>();
+
+        // Calculate the starting sector based on the global rotation angle
+        double normalizedAngle = rotationAngle + globalRotationAngle;
+        normalizedAngle = normalizedAngle % (2 * Math.PI);
+        if (normalizedAngle < 0) {
+            normalizedAngle += 2 * Math.PI;
+        }
+        int startingSector = (int) Math.floor(normalizedAngle / (Math.PI / 3));
+        startingSector = startingSector % 6;
+        if (startingSector < 0) {
+            startingSector += 6;
+        }
+
+        // Add sectors based on the sides array
+        for (int i = 0; i < sides.length; i++) {
+            if (sides[i]) {
+                int sector = (startingSector + i) % 6;
+                occupiedSectors.add(sector);
+            }
+        }
+
+        return occupiedSectors;
+    }
+
+
     public void draw(Graphics2D g2d) {
         AffineTransform originalTransform = g2d.getTransform();
 
@@ -111,6 +139,7 @@ public class Obstacle {
             currentSize = 0;
         }
     }
+
 
     public int getX() {
         return x;
@@ -192,4 +221,11 @@ public class Obstacle {
         this.obstacleType = obstacleType;
     }
 
+    public boolean[] getSides() {
+        return sides;
+    }
+
+    public void setSides(boolean[] sides) {
+        this.sides = sides;
+    }
 }

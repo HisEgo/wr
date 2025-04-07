@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -29,10 +31,11 @@ public class GamePanel extends JPanel implements ActionListener {
     private int colorChangeInterval = 30;
     private int frameCounter = 0;
     private boolean gameOver = false;
-
     private double globalRotationAngle = 0;
     private double rotationSpeed = 0.01;
 
+    private int playerSector; // فیلد برای ذخیره سکتور فعلی پلیر
+    private boolean paused = false; // Flag to indicate if the game is paused
 
     public GamePanel() {
         setPreferredSize(new Dimension(800, 600));
@@ -57,21 +60,46 @@ public class GamePanel extends JPanel implements ActionListener {
         im.put(KeyStroke.getKeyStroke("LEFT"), "rotateLeft");
         am.put("rotateLeft", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                player.rotateLeft();
-                repaint();
+                if (!paused) {
+                    player.rotateLeft();
+                    updatePlayerSector(); // به‌روزرسانی سکتور پلیر
+                    repaint();
+                }
             }
         });
 
         im.put(KeyStroke.getKeyStroke("RIGHT"), "rotateRight");
         am.put("rotateRight", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                player.rotateRight();
-                repaint();
+                if (!paused) {
+                    player.rotateRight();
+                    updatePlayerSector(); // به‌روزرسانی سکتور پلیر
+                    repaint();
+                }
+            }
+        });
+
+        // Key listener for pause/resume
+        addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_P) {
+                    paused = !paused;
+                    System.out.println("Game Paused: " + paused);
+                    if (paused) {
+                        timer.stop(); // Stop the timer when paused
+                    } else {
+                        timer.start(); // Start the timer when resumed
+                    }
+                    repaint(); // Redraw the panel to show the pause message
+                }
             }
         });
 
         hexagonX = new double[6];
         hexagonY = new double[6];
+
+        updatePlayerSector(); // تعیین سکتور اولیه پلیر
     }
 
     @Override
@@ -93,6 +121,7 @@ public class GamePanel extends JPanel implements ActionListener {
         g2d.rotate(globalRotationAngle, centerX, centerY);
         drawSectors(g2d, centerX, centerY);
         hexagon.draw(g2d);
+
         g2d.rotate(-globalRotationAngle, centerX, centerY);
 
         g2d.rotate(globalRotationAngle, centerX, centerY);
@@ -100,7 +129,8 @@ public class GamePanel extends JPanel implements ActionListener {
         g2d.rotate(-globalRotationAngle, centerX, centerY);
 
         drawObstacles(g2d);
-
+        printObstacleSectors();
+        printPlayerSector();
 
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
@@ -115,6 +145,18 @@ public class GamePanel extends JPanel implements ActionListener {
             int textX = centerX - textWidth / 2;
             int textY = centerY;
             g2d.drawString(gameOverText, textX, textY);
+        }
+
+        // Display "Paused" message when the game is paused
+        if (paused) {
+            g2d.setColor(Color.RED);
+            g2d.setFont(new Font("Arial", Font.BOLD, 48));
+            FontMetrics fm = g2d.getFontMetrics();
+            String pausedText = "Paused";
+            int stringWidth = fm.stringWidth(pausedText);
+            int textX = centerX - stringWidth / 2;
+            int textY = centerY;
+            g2d.drawString(pausedText, textX, textY);
         }
     }
 
@@ -143,7 +185,6 @@ public class GamePanel extends JPanel implements ActionListener {
         player.setY((int) playerY);
     }
 
-
     private void drawObstacles(Graphics2D g2d) {
         for (Obstacle obstacle : obstacles) {
             AffineTransform originalTransform = g2d.getTransform();
@@ -169,7 +210,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (gameOver) {
+        if (gameOver || paused) {
             return;
         }
 
@@ -203,51 +244,16 @@ public class GamePanel extends JPanel implements ActionListener {
             }
 
             globalRotationAngle = (globalRotationAngle + rotationSpeed) % (2 * Math.PI);
-
+            updatePlayerSector(); // به‌روزرسانی سکتور پلیر
             repaint();
         }
     }
 
-    private boolean checkCollision(Obstacle obstacle) {
-        double playerDistanceFromCenter = hexagonSize;
 
-        double playerAngle = player.getAngle();
-        int sector = (int) Math.floor(playerAngle / (Math.PI / 3));
-        sector = (sector % 6 + 6) % 6;
-
-        double obstacleSize = obstacle.getCurrentSize();
-        double angle1 = 2 * Math.PI / 6 * sector;
-        double angle2 = 2 * Math.PI / 6 * (sector + 1);
-
-        double x1 = centerX + (obstacleSize) * Math.cos(angle1);
-        double y1 = centerY + (obstacleSize) * Math.sin(angle1);
-        double x2 = centerX + (obstacleSize) * Math.cos(angle2);
-        double y2 = centerY + (obstacleSize) * Math.sin(angle2);
-
-        double x1Offset = centerX + (obstacleSize + obstacle.getBorderWidth()) * Math.cos(angle1);
-        double y1Offset = centerY + (obstacleSize + obstacle.getBorderWidth()) * Math.sin(angle1);
-        double x2Offset = centerX + (obstacleSize + obstacle.getBorderWidth()) * Math.cos(angle2);
-        double y2Offset = centerY + (obstacleSize + obstacle.getBorderWidth()) * Math.sin(angle2);
-
-        double playerX = player.getX();
-        double playerY = player.getY();
-
-        boolean inside = isInside(playerX, playerY, new double[]{x1, x2, x2Offset, x1Offset}, new double[]{y1, y2, y2Offset, y1Offset});
-
-        return inside;
+    public boolean checkCollision(Obstacle obstacle) {
+        return false;
     }
 
-    private boolean isInside(double x, double y, double[] polyX, double[] polyY) {
-        int n = polyX.length;
-        boolean inside = false;
-        for (int i = 0, j = n - 1; i < n; j = i++) {
-            if (((polyY[i] > y) != (polyY[j] > y)) &&
-                    (x < (polyX[j] - polyX[i]) * (y - polyY[i]) / (polyY[j] - polyY[i]) + polyX[i])) {
-                inside = !inside;
-            }
-        }
-        return inside;
-    }
 
     private void addNewObstacle() {
         if (obstacles.isEmpty() || obstacles.get(obstacles.size() - 1).getInitialSize() - obstacles.get(obstacles.size() - 1).getCurrentSize() > obstacleSpacing) {
@@ -276,6 +282,21 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    private void printObstacleSectors() {
+        System.out.println("Obstacle Sectors:");
+        for (int i = 0; i < obstacles.size(); i++) {
+            Obstacle obstacle = obstacles.get(i);
+            List<Integer> sectors = obstacle.getOccupiedSectors(globalRotationAngle);
+            System.out.println("Obstacle " + i + " Sectors: " + sectors);
+        }
+    }
+
+    private void printPlayerSector() {
+        int sector = playerSector;
+        System.out.println("Player Sector: " + sector);
+    }
+
+
     private void generateRandomColor() {
         int red = random.nextInt(256);
         int green = random.nextInt(256);
@@ -283,4 +304,10 @@ public class GamePanel extends JPanel implements ActionListener {
         randomColor = new Color(red, green, blue);
     }
 
+    // متد برای تعیین سکتور فعلی پلیر
+    public void updatePlayerSector() {
+        double angle = player.getAngle();
+        playerSector = (int) Math.floor(angle / (Math.PI / 3));
+        playerSector = (playerSector % 6 + 6) % 6;
+    }
 }
