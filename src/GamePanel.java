@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -14,7 +13,6 @@ import java.awt.geom.AffineTransform;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-
     private Hexagon hexagon;
     private int hexagonSize;
     private int largerHexagonSize;
@@ -26,7 +24,8 @@ public class GamePanel extends JPanel implements ActionListener {
     private int obstacleSpawnDistance;
     private Timer timer;
     private boolean obstacleCreated = false;
-    private int score = 0;
+    private long startTime;
+    private double elapsedTime;
     private int obstacleSpacing = 150;
     private double[] hexagonX;
     private double[] hexagonY;
@@ -54,6 +53,8 @@ public class GamePanel extends JPanel implements ActionListener {
         random = new Random();
 
         obstacleSpawnDistance = hexagonSize * 3;
+
+        startTime = System.nanoTime();
         timer = new Timer(20, this);
         timer.start();
 
@@ -143,7 +144,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
-        g2d.drawString("Time: " + score, 10, 30);
+
+        g2d.drawString("Time: " + formatTime(elapsedTime), 10, 30);
+        g2d.drawString("Best: " + formatTime(0), 600, 30);
 
         if (gameOver) {
             g2d.setColor(Color.RED);
@@ -223,6 +226,9 @@ public class GamePanel extends JPanel implements ActionListener {
         }
 
         if (e.getSource() == timer) {
+            long now = System.nanoTime();
+            elapsedTime = (now - startTime) / 1_000_000_000.0;
+
             addNewObstacle();
 
             Iterator<Obstacle> iterator = obstacles.iterator();
@@ -257,10 +263,18 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    // فرمت‌بندی زمان به صورت "00:00.00"
+    private String formatTime(double time) {
+        int minutes = (int) (time / 60);
+        int seconds = (int) (time % 60);
+        int milliseconds = (int) ((time * 100) % 100);
+        return String.format("%02d:%02d.%02d", minutes, seconds, milliseconds);
+    }
+
 
     public boolean checkCollision(List<Obstacle> obstacles) {
 
-        if (obstacles.get(0).getCurrentSize() <= player.getDistanceFromCenter()) {
+        if (Math.abs(obstacles.get(0).getCurrentSize() - player.getDistanceFromCenter()) <= 10) {
             int playerSector = player.getCurrentSector();
             for (int i = 0; i < obstacles.get(0).getOccupiedSectors().size(); i++) {
                 if (playerSector == obstacles.get(0).getOccupiedSectors().get(i)) {
