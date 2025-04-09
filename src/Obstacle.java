@@ -68,7 +68,6 @@ public class Obstacle {
     public List<Integer> getOccupiedSectors(double globalRotationAngle) {
         List<Integer> occupiedSectors = new ArrayList<>();
 
-        // Calculate the starting sector based on the global rotation angle
         double normalizedAngle = rotationAngle + globalRotationAngle;
         normalizedAngle = normalizedAngle % (2 * Math.PI);
         if (normalizedAngle < 0) {

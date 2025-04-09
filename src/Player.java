@@ -4,7 +4,7 @@ class Player {
     private int x, y, size;
     private double angle = 0;
     private double rotationSpeed = 0.1;
-    private int distanceFromCenter = 55;
+    private int distanceFromCenter = 54;
     private int centerX, centerY;
     private double[] hexagonX;
     private double[] hexagonY;

@@ -34,8 +34,8 @@ public class GamePanel extends JPanel implements ActionListener {
     private double globalRotationAngle = 0;
     private double rotationSpeed = 0.01;
 
-    private int playerSector; // فیلد برای ذخیره سکتور فعلی پلیر
-    private boolean paused = false; // Flag to indicate if the game is paused
+    private int playerSector;
+    private boolean paused = false;
 
     public GamePanel() {
         setPreferredSize(new Dimension(800, 600));
@@ -62,7 +62,7 @@ public class GamePanel extends JPanel implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 if (!paused) {
                     player.rotateLeft();
-                    updatePlayerSector(); // به‌روزرسانی سکتور پلیر
+                    updatePlayerSector();
                     repaint();
                 }
             }
@@ -73,7 +73,7 @@ public class GamePanel extends JPanel implements ActionListener {
             public void actionPerformed(ActionEvent e) {
                 if (!paused) {
                     player.rotateRight();
-                    updatePlayerSector(); // به‌روزرسانی سکتور پلیر
+                    updatePlayerSector();
                     repaint();
                 }
             }
@@ -87,11 +87,11 @@ public class GamePanel extends JPanel implements ActionListener {
                     paused = !paused;
                     System.out.println("Game Paused: " + paused);
                     if (paused) {
-                        timer.stop(); // Stop the timer when paused
+                        timer.stop();
                     } else {
-                        timer.start(); // Start the timer when resumed
+                        timer.start();
                     }
-                    repaint(); // Redraw the panel to show the pause message
+                    repaint();
                 }
             }
         });
@@ -99,7 +99,7 @@ public class GamePanel extends JPanel implements ActionListener {
         hexagonX = new double[6];
         hexagonY = new double[6];
 
-        updatePlayerSector(); // تعیین سکتور اولیه پلیر
+        updatePlayerSector();
     }
 
     @Override
@@ -147,7 +147,6 @@ public class GamePanel extends JPanel implements ActionListener {
             g2d.drawString(gameOverText, textX, textY);
         }
 
-        // Display "Paused" message when the game is paused
         if (paused) {
             g2d.setColor(Color.RED);
             g2d.setFont(new Font("Arial", Font.BOLD, 48));
@@ -244,14 +243,20 @@ public class GamePanel extends JPanel implements ActionListener {
             }
 
             globalRotationAngle = (globalRotationAngle + rotationSpeed) % (2 * Math.PI);
-            updatePlayerSector(); // به‌روزرسانی سکتور پلیر
+            updatePlayerSector();
             repaint();
         }
     }
 
 
     public boolean checkCollision(Obstacle obstacle) {
-        return false;
+
+        if (obstacle.getCurrentSize() == player.getDistanceFromCenter()) {
+            int playerSector = player.getCurrentSector();
+            return obstacle.getSides()[playerSector];
+        } else {
+            return false;
+        }
     }
 
 
@@ -304,7 +309,6 @@ public class GamePanel extends JPanel implements ActionListener {
         randomColor = new Color(red, green, blue);
     }
 
-    // متد برای تعیین سکتور فعلی پلیر
     public void updatePlayerSector() {
         double angle = player.getAngle();
         playerSector = (int) Math.floor(angle / (Math.PI / 3));
