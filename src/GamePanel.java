@@ -63,10 +63,12 @@ public class GamePanel extends JPanel implements ActionListener {
         im.put(KeyStroke.getKeyStroke("LEFT"), "rotateLeft");
         am.put("rotateLeft", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (!paused) {
-                    player.rotateLeft();
-                    updatePlayerSector();
-                    repaint();
+                if (!gameOver) {
+                    if (!paused) {
+                        player.rotateLeft();
+                        updatePlayerSector();
+                        repaint();
+                    }
                 }
             }
         });
@@ -74,27 +76,31 @@ public class GamePanel extends JPanel implements ActionListener {
         im.put(KeyStroke.getKeyStroke("RIGHT"), "rotateRight");
         am.put("rotateRight", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
-                if (!paused) {
-                    player.rotateRight();
-                    updatePlayerSector();
-                    repaint();
+                if (!gameOver) {
+                    if (!paused) {
+                        player.rotateRight();
+                        updatePlayerSector();
+                        repaint();
+                    }
                 }
             }
         });
 
-        // Key listener for pause/resume
+
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_P) {
-                    paused = !paused;
-                    System.out.println("Game Paused: " + paused);
-                    if (paused) {
-                        timer.stop();
-                    } else {
-                        timer.start();
+                if (!gameOver) {
+                    if (e.getKeyCode() == KeyEvent.VK_P) {
+                        paused = !paused;
+                        System.out.println("Game Paused: " + paused);
+                        if (paused) {
+                            timer.stop();
+                        } else {
+                            timer.start();
+                        }
+                        repaint();
                     }
-                    repaint();
                 }
             }
         });
@@ -122,7 +128,7 @@ public class GamePanel extends JPanel implements ActionListener {
         calculatePlayerPosition();
 
         g2d.rotate(globalRotationAngle, centerX, centerY);
-        drawSectors(g2d, centerX, centerY);
+        //drawSectors(g2d, centerX, centerY);
         hexagon.draw(g2d);
 
         g2d.rotate(-globalRotationAngle, centerX, centerY);
@@ -137,7 +143,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
-        g2d.drawString("Score: " + score, 10, 30);
+        g2d.drawString("Time: " + score, 10, 30);
 
         if (gameOver) {
             g2d.setColor(Color.RED);
@@ -254,7 +260,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public boolean checkCollision(List<Obstacle> obstacles) {
 
-        if (obstacles.get(0).getCurrentSize() == player.getDistanceFromCenter()) {
+        if (obstacles.get(0).getCurrentSize() <= player.getDistanceFromCenter()) {
             int playerSector = player.getCurrentSector();
             for (int i = 0; i < obstacles.get(0).getOccupiedSectors().size(); i++) {
                 if (playerSector == obstacles.get(0).getOccupiedSectors().get(i)) {
@@ -280,7 +286,6 @@ public class GamePanel extends JPanel implements ActionListener {
 
             int sector = random.nextInt(6);
             double angle = 2 * Math.PI / 6 * sector;
-            // Correct the angle based on the sector
             angle = Math.round(angle / (Math.PI / 3)) * (Math.PI / 3);
 
             int obstacleType = random.nextInt(3) + 1;
