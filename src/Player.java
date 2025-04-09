@@ -1,4 +1,6 @@
+
 import java.awt.*;
+
 
 class Player {
     private int x, y, size;
@@ -8,6 +10,7 @@ class Player {
     private int centerX, centerY;
     private double[] hexagonX;
     private double[] hexagonY;
+
 
     public Player(int x, int y, int size) {
         this.x = x;
@@ -118,4 +121,5 @@ class Player {
         }
         return (int) (angle / (Math.PI / 3));
     }
+
 }

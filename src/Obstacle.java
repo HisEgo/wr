@@ -1,8 +1,10 @@
+
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 
 public class Obstacle {
     private int x;
@@ -15,6 +17,7 @@ public class Obstacle {
     private Color color;
     private int obstacleType;
     public boolean[] sides;
+
 
     private double rotationAngle = 0;
 
@@ -65,10 +68,10 @@ public class Obstacle {
         }
     }
 
-    public List<Integer> getOccupiedSectors(double globalRotationAngle) {
+    public List<Integer> getOccupiedSectors() {
         List<Integer> occupiedSectors = new ArrayList<>();
 
-        double normalizedAngle = rotationAngle + globalRotationAngle;
+        double normalizedAngle = rotationAngle;
         normalizedAngle = normalizedAngle % (2 * Math.PI);
         if (normalizedAngle < 0) {
             normalizedAngle += 2 * Math.PI;
@@ -79,10 +82,9 @@ public class Obstacle {
             startingSector += 6;
         }
 
-        // Add sectors based on the sides array
         for (int i = 0; i < sides.length; i++) {
             if (sides[i]) {
-                int sector = (startingSector + i) % 6;
+                int sector = ((startingSector + i) % 6);
                 occupiedSectors.add(sector);
             }
         }
@@ -227,4 +229,5 @@ public class Obstacle {
     public void setSides(boolean[] sides) {
         this.sides = sides;
     }
+
 }

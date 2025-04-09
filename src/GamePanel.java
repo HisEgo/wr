@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -10,7 +11,9 @@ import java.util.List;
 import java.util.Random;
 import java.awt.geom.AffineTransform;
 
+
 public class GamePanel extends JPanel implements ActionListener {
+
 
     private Hexagon hexagon;
     private int hexagonSize;
@@ -226,7 +229,7 @@ public class GamePanel extends JPanel implements ActionListener {
                     obstacleCreated = false;
                 }
 
-                if (checkCollision(obstacle)) {
+                if (checkCollision(obstacles)) {
                     gameOver = true;
                     timer.stop();
                     repaint();
@@ -249,15 +252,19 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
 
-    public boolean checkCollision(Obstacle obstacle) {
+    public boolean checkCollision(List<Obstacle> obstacles) {
 
-        if (obstacle.getCurrentSize() == player.getDistanceFromCenter()) {
+        if (obstacles.get(0).getCurrentSize() == player.getDistanceFromCenter()) {
             int playerSector = player.getCurrentSector();
-            return obstacle.getSides()[playerSector];
-        } else {
-            return false;
+            for (int i = 0; i < obstacles.get(0).getOccupiedSectors().size(); i++) {
+                if (playerSector == obstacles.get(0).getOccupiedSectors().get(i)) {
+                    return true;
+                }
+            }
         }
+        return false;
     }
+
 
 
     private void addNewObstacle() {
@@ -291,7 +298,7 @@ public class GamePanel extends JPanel implements ActionListener {
         System.out.println("Obstacle Sectors:");
         for (int i = 0; i < obstacles.size(); i++) {
             Obstacle obstacle = obstacles.get(i);
-            List<Integer> sectors = obstacle.getOccupiedSectors(globalRotationAngle);
+            List<Integer> sectors = obstacle.getOccupiedSectors();
             System.out.println("Obstacle " + i + " Sectors: " + sectors);
         }
     }
@@ -314,4 +321,5 @@ public class GamePanel extends JPanel implements ActionListener {
         playerSector = (int) Math.floor(angle / (Math.PI / 3));
         playerSector = (playerSector % 6 + 6) % 6;
     }
+
 }
