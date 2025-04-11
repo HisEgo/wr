@@ -9,6 +9,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.awt.geom.AffineTransform;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Scanner;
 
 
 public class GamePanel extends JPanel implements ActionListener {
@@ -26,8 +30,9 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean obstacleCreated = false;
     private long startTime;
     private double elapsedTime;
+    private double bestTime = 0;
     private double timeSinceLastSpeedIncrease = 0;
-    private double speedIncrement = 0.1;
+    private double speedIncrement = 0.2;
     private int obstacleSpacing = 150;
     private double[] hexagonX;
     private double[] hexagonY;
@@ -38,8 +43,12 @@ public class GamePanel extends JPanel implements ActionListener {
     private double globalRotationAngle = 0;
     private double rotationSpeed = 0.01;
 
+
     private int playerSector;
     private boolean paused = false;
+
+
+
 
     public GamePanel() {
         setPreferredSize(new Dimension(800, 600));
@@ -112,7 +121,22 @@ public class GamePanel extends JPanel implements ActionListener {
         hexagonY = new double[6];
 
         updatePlayerSector();
+
+        try {
+            File file = new File("bestTime.txt");
+            if (file.exists()) {
+                Scanner scanner = new Scanner(file);
+                if (scanner.hasNextDouble()) {
+                    bestTime = scanner.nextDouble();
+                }
+                scanner.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            bestTime = 0;
+        }
     }
+
 
     @Override
     protected void paintComponent(Graphics g) {
@@ -152,7 +176,7 @@ public class GamePanel extends JPanel implements ActionListener {
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
 
         g2d.drawString("Time: " + formatTime(elapsedTime), 10, 30);
-        g2d.drawString("Best: " + formatTime(0), 600, 30);
+        g2d.drawString("Best: " + formatTime(bestTime), 600, 30);
 
         if (gameOver) {
             g2d.setColor(Color.RED);
@@ -257,6 +281,16 @@ public class GamePanel extends JPanel implements ActionListener {
 
                 if (checkCollision(obstacles)) {
                     gameOver = true;
+                    if (elapsedTime > bestTime) {
+                        bestTime = elapsedTime;
+                        try {
+                            FileWriter writer = new FileWriter("bestTime.txt");
+                            writer.write(String.valueOf(bestTime));
+                            writer.close();
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                     timer.stop();
                     repaint();
                     break;
@@ -374,4 +408,7 @@ public class GamePanel extends JPanel implements ActionListener {
         playerSector = (playerSector % 6 + 6) % 6;
     }
 
+    public double getBestTime() {
+        return bestTime;
+    }
 }

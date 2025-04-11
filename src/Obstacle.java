@@ -135,7 +135,7 @@ public class Obstacle {
     }
 
     public void update() {
-        currentSize -= shrinkRate;
+        currentSize -= shrinkRate * speed;
         if (currentSize < 0) {
             currentSize = 0;
         }

@@ -5,7 +5,7 @@ import java.awt.*;
 class Player {
     private int x, y, size;
     private double angle = 0;
-    private double rotationSpeed = 0.2;
+    private double rotationSpeed = 0.5;
     private int distanceFromCenter = 55;
     private int centerX, centerY;
     private double[] hexagonX;
