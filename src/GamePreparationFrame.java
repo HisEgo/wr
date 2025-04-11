@@ -7,9 +7,11 @@ import java.awt.event.ActionListener;
 public class GamePreparationFrame extends JFrame {
     private JTextField playerNameField;
     private JButton startButton;
+    private MainFrame mainFrame;
 
 
-    public GamePreparationFrame() {
+    public GamePreparationFrame(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
         setTitle("Game Preparation");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -29,12 +31,17 @@ public class GamePreparationFrame extends JFrame {
                     //
                     JOptionPane.showMessageDialog(GamePreparationFrame.this, "Starting game with " + playerName);
                     dispose();
-                    new GameFrame();
+                    GameFrame gameFrame = new GameFrame(mainFrame);
+                    GamePanel gamePanel = new GamePanel(mainFrame);
+                    gameFrame.add(gamePanel);
+                    gameFrame.setVisible(true);
                 } else {
                     JOptionPane.showMessageDialog(GamePreparationFrame.this, "Please enter your name!");
                 }
             }
         });
+
+
 
         add(nameLabel);
         add(playerNameField);

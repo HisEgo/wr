@@ -30,8 +30,8 @@ public class MainFrame extends JFrame {
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new GamePreparationFrame();
-            }
+                new GamePreparationFrame(MainFrame.this);            }
+
         });
 
         bestTimeLabel = new JLabel("Best Time: " + getBestTime());
@@ -105,12 +105,6 @@ public class MainFrame extends JFrame {
     }
 
     public void updateBestTime(String newTime) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("bestTime.txt"))) {
-            bw.write(newTime);
-            bestTimeLabel.setText("Best Time: " + newTime);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        bestTimeLabel.setText("Best Time: " + newTime);
     }
-
 }

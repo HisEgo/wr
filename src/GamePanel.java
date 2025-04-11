@@ -46,11 +46,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private int playerSector;
     private boolean paused = false;
+    private MainFrame mainFrame;
 
 
 
-
-    public GamePanel() {
+    public GamePanel(MainFrame mainFrame) {
+        this.mainFrame = mainFrame;
         setPreferredSize(new Dimension(800, 600));
         setBackground(Color.BLUE);
         setFocusable(true);
@@ -176,7 +177,8 @@ public class GamePanel extends JPanel implements ActionListener {
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
 
         g2d.drawString("Time: " + formatTime(elapsedTime), 10, 30);
-        g2d.drawString("Best: " + formatTime(bestTime), 600, 30);
+        double bt = Math.max(bestTime, elapsedTime);
+        g2d.drawString("Best: " + formatTime(bt), 600, 30);
 
         if (gameOver) {
             g2d.setColor(Color.RED);
@@ -290,6 +292,9 @@ public class GamePanel extends JPanel implements ActionListener {
                         } catch (IOException ex) {
                             ex.printStackTrace();
                         }
+                    }
+                    if (mainFrame != null) {
+                        mainFrame.updateBestTime(formatTime(bestTime));
                     }
                     timer.stop();
                     repaint();
