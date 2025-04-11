@@ -27,7 +27,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private long startTime;
     private double elapsedTime;
     private double timeSinceLastSpeedIncrease = 0;
-    private double speedIncrement = 0.5;
+    private double speedIncrement = 0.1;
     private int obstacleSpacing = 150;
     private double[] hexagonX;
     private double[] hexagonY;
@@ -43,7 +43,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public GamePanel() {
         setPreferredSize(new Dimension(800, 600));
-        setBackground(Color.BLACK);
+        setBackground(Color.BLUE);
         setFocusable(true);
         requestFocusInWindow();
 
@@ -131,7 +131,10 @@ public class GamePanel extends JPanel implements ActionListener {
         calculatePlayerPosition();
 
         g2d.rotate(globalRotationAngle, centerX, centerY);
-        //drawSectors(g2d, centerX, centerY);
+        drawSectors(g2d, centerX, centerY);
+        g2d.setColor(Color.BLACK);
+        g2d.fill(hexagon.getPath());
+        hexagon.setColor(Color.BLACK);
         hexagon.draw(g2d);
 
         g2d.rotate(-globalRotationAngle, centerX, centerY);
@@ -143,6 +146,7 @@ public class GamePanel extends JPanel implements ActionListener {
         drawObstacles(g2d);
         printObstacleSectors();
         printPlayerSector();
+        printObstacleSpeed();
 
         g2d.setColor(Color.WHITE);
         g2d.setFont(new Font("Arial", Font.BOLD, 20));
@@ -231,7 +235,7 @@ public class GamePanel extends JPanel implements ActionListener {
             long now = System.nanoTime();
             elapsedTime = (now - startTime) / 1_000_000_000.0;
 
-            if (elapsedTime - timeSinceLastSpeedIncrease >= 5) {
+            if (elapsedTime - timeSinceLastSpeedIncrease >= 10) {
                 for (Obstacle obstacle : obstacles) {
                     double currentSpeed = obstacle.getSpeed();
                     obstacle.setSpeed(currentSpeed + speedIncrement);
@@ -304,7 +308,12 @@ public class GamePanel extends JPanel implements ActionListener {
             int initialSize = 400;
             int borderWidth = 20;
             double shrinkRate = 2;
-            double speed = 1;
+            double speed;
+            if (obstacles.isEmpty()){
+                speed = 1;
+            } else {
+                speed = obstacles.get(0).getSpeed();
+            }
             Color color = Color.WHITE;
 
             int sector = random.nextInt(6);
@@ -331,6 +340,15 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    private void printObstacleSpeed() {
+        System.out.println("Speed: ");
+        for (int i = 0; i < obstacles.size(); i++) {
+            Obstacle obstacle = obstacles.get(i);
+            System.out.println("Obstacle " + i + " " + obstacle.getSpeed());
+
+        }
+    }
+
     private void printPlayerSector() {
         int sector = playerSector;
         System.out.println("Player Sector: " + sector);
@@ -338,10 +356,16 @@ public class GamePanel extends JPanel implements ActionListener {
 
 
     private void generateRandomColor() {
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
-        randomColor = new Color(red, green, blue);
+        Color newColor;
+        do {
+            int red = random.nextInt(256);
+            int green = random.nextInt(256);
+            int blue = random.nextInt(256);
+            newColor = new Color(red, green, blue);
+        } while (newColor.equals(Color.WHITE) ||
+                newColor.equals(Color.GREEN) ||
+                newColor.equals(Color.RED));
+        randomColor = newColor;
     }
 
     public void updatePlayerSector() {

@@ -8,16 +8,20 @@ public class Hexagon {
     private int borderWidth;
     private Color color;
 
+    private Path2D hexagon;
+
     public Hexagon(int x, int y, int size, int borderWidth, Color color) {
         this.x = x;
         this.y = y;
         this.size = size;
         this.borderWidth = borderWidth;
         this.color = color;
+        this.hexagon = new Path2D.Double();
+        calculateHexagonPath();
     }
 
-    public void draw(Graphics2D g2d) {
-        Path2D hexagon = new Path2D.Double();
+    private void calculateHexagonPath() {
+        hexagon.reset();
         for (int i = 0; i < 6; i++) {
             double angle = 2 * Math.PI / 6 * i;
             double pointX = x + size * Math.cos(angle);
@@ -29,7 +33,9 @@ public class Hexagon {
             }
         }
         hexagon.closePath();
+    }
 
+    public void draw(Graphics2D g2d) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(borderWidth));
         g2d.draw(hexagon);
@@ -41,6 +47,7 @@ public class Hexagon {
 
     public void setX(int x) {
         this.x = x;
+        calculateHexagonPath();
     }
 
     public int getY() {
@@ -49,6 +56,7 @@ public class Hexagon {
 
     public void setY(int y) {
         this.y = y;
+        calculateHexagonPath();
     }
 
     public int getSize() {
@@ -57,6 +65,7 @@ public class Hexagon {
 
     public void setSize(int size) {
         this.size = size;
+        calculateHexagonPath();
     }
 
     public int getBorderWidth() {
@@ -73,5 +82,9 @@ public class Hexagon {
 
     public void setColor(Color color) {
         this.color = color;
+    }
+
+    public Path2D getPath() {
+        return hexagon;
     }
 }
