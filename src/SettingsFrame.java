@@ -3,11 +3,19 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Properties;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
 
 public class SettingsFrame extends JFrame {
 
     private JCheckBox saveHistoryCheckBox;
-    public SettingsFrame(){
+    private JSlider volumeSlider;
+    private SoundManager soundManager;
+
+    public SettingsFrame(SoundManager soundManager){
+        this.soundManager = soundManager;
+
         setTitle("Settings");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -17,7 +25,15 @@ public class SettingsFrame extends JFrame {
         settingsPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20 , 20));
 
         JLabel volumeLabel1 = new JLabel("Volume:");
-        JSlider volumeSlider = new JSlider(0, 100, 50);
+        volumeSlider = new JSlider(0, 100, 50);
+
+        volumeSlider.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                float volume = volumeSlider.getValue() / 100f;
+                soundManager.setVolume(volume);
+            }
+        });
 
         saveHistoryCheckBox = new JCheckBox("Save Game History");
 
@@ -31,11 +47,9 @@ public class SettingsFrame extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean saveHistory = saveHistoryCheckBox.isSelected();
-                //
-                System.out.println("Save History: " + saveHistory);
                 int volume = volumeSlider.getValue();
                 ConfigManager.saveConfig(saveHistory, volume);
-                
+
                 JOptionPane.showMessageDialog(SettingsFrame.this, "Setting applied!");
                 dispose();
             }

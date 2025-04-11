@@ -7,6 +7,8 @@ import java.io.*;
 public class MainFrame extends JFrame {
 
     private JLabel bestTimeLabel;
+    private SoundManager soundManager;
+
     public MainFrame() {
         setTitle("Super Hexagon");
         setSize(800, 600);
@@ -14,6 +16,9 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
+
+        soundManager = new SoundManager("D:\\\\Homeworks\\\\AP2\\\\courtesy.wav"); // Replace with your music file path
+        soundManager.playBackgroundMusic();
 
         JPanel mainMenuPanel = new JPanel();
         mainMenuPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 50, 50));
@@ -47,7 +52,7 @@ public class MainFrame extends JFrame {
         settingsButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SettingsFrame();
+                new SettingsFrame(soundManager);
             }
         });
 
