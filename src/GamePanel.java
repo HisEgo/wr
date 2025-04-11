@@ -26,6 +26,8 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean obstacleCreated = false;
     private long startTime;
     private double elapsedTime;
+    private double timeSinceLastSpeedIncrease = 0;
+    private double speedIncrement = 0.5;
     private int obstacleSpacing = 150;
     private double[] hexagonX;
     private double[] hexagonY;
@@ -229,6 +231,14 @@ public class GamePanel extends JPanel implements ActionListener {
             long now = System.nanoTime();
             elapsedTime = (now - startTime) / 1_000_000_000.0;
 
+            if (elapsedTime - timeSinceLastSpeedIncrease >= 5) {
+                for (Obstacle obstacle : obstacles) {
+                    double currentSpeed = obstacle.getSpeed();
+                    obstacle.setSpeed(currentSpeed + speedIncrement);
+                }
+                timeSinceLastSpeedIncrease = elapsedTime;
+            }
+
             addNewObstacle();
 
             Iterator<Obstacle> iterator = obstacles.iterator();
@@ -263,7 +273,6 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    // فرمت‌بندی زمان به صورت "00:00.00"
     private String formatTime(double time) {
         int minutes = (int) (time / 60);
         int seconds = (int) (time % 60);

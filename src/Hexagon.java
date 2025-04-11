@@ -35,25 +35,6 @@ public class Hexagon {
         g2d.draw(hexagon);
     }
 
-    public void draw2(Graphics2D g2d) {
-        Path2D hexagon = new Path2D.Double();
-        for (int i = 0; i < 6; i++) {
-            double angle = 2 * Math.PI / 6 * i;
-            double pointX = x + 50 * Math.cos(angle);
-            double pointY = y + 50 * Math.sin(angle);
-            if (i == 0) {
-                hexagon.moveTo(pointX, pointY);
-            } else {
-                hexagon.lineTo(pointX, pointY);
-            }
-        }
-        hexagon.closePath();
-
-        g2d.setColor(color);
-        g2d.setStroke(new BasicStroke(borderWidth));
-        g2d.draw(hexagon);
-    }
-
     public int getX() {
         return x;
     }
